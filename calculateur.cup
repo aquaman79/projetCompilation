@@ -1,0 +1,300 @@
+import java_cup.runtime.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.lang.String ;
+import java.util.Iterator; 
+import java.util.List; 
+import java.util.ArrayList;
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+action code{:
+    class Entier {
+        static Integer result =0 ;
+        static Integer val = 0 ; 
+        static String resultC = "";
+        static Integer fval = 0;
+        static Integer resultatTF = 0;
+        static Integer resultatT = 0; 
+        static Integer eval = 0; 
+        static Integer resultatE = 0;
+        static int mutex = 0; 
+        static int muyex = 0; 
+        static boolean isInteger= false;
+        static String IdentEntier= new String() ; 
+        public static void rent(){
+          result =0 ;
+          val = 0 ; 
+          resultC = "";
+          fval = 0;
+          resultatTF = 0;
+          resultatT = 0; 
+          eval = 0; 
+          resultatE = 0;
+          mutex = 0; 
+          muyex = 0; 
+          isInteger= false;
+          IdentEntier= new String() ; 
+
+
+        }
+
+    } 
+    String GlError = null;
+    class Chaine {
+        static String result =new String() ;
+        static String val = new String(); 
+        static String resultC = "";
+        static String fval = new String();
+        static String resultatTF = new String();
+        static String resultatT = new String(); 
+        static String eval = new String(); 
+        static String resultatE = new String();
+        static int mutex = 0; 
+        static int muyex = 0; 
+        static boolean isChaine= false;
+        static String IdentChaine= new String() ; 
+        public static void rent(){
+          result =new String() ;
+          val = new String() ; 
+          resultC = "";
+          fval = new String();
+          resultatTF = new String();
+          resultatT = new String(); 
+          eval = new String(); 
+          resultatE = new String();
+          mutex = 0; 
+          muyex = 0; 
+          isChaine= false;
+          IdentChaine= new String() ; 
+        }
+
+    } 
+
+    class Erreur {
+        static final String erreurDeTypage = new String("erreur: type incorrect sur affectation"); 
+        static final String erreurOperateurMoins = new String("erreur: type incorrect sur opérateur -"); 
+        static final String erreurOperateurPlus = new String("erreur: type incorrect sur opérateur +"); 
+        static final String erreurDivisionZero = new String("erreur: Division sur 0!");
+            
+    }
+    int mutexAff = 0;
+    HashMap<String,Object> tableAssociation = new HashMap();
+
+:}
+
+terminal PLUS,MINOS,MULT,DIV,OUVERTE,FERME,AFFECT,PRINT,RL;
+terminal String IDENTENTIER;
+terminal String IDENTCHAINE;
+terminal String CHAINE;
+terminal Integer ENTIER;
+non terminal E,T,S,F,G;
+precedence left PLUS,MINOS; // MEME PRERIORITEE
+precedence left MULT,DIV ;// apres la premiere de ligne donc plus PRERIORITEE de la ligne precedent 
+precedence left OUVERTE;
+
+S ::= E 
+{: 
+if(mutexAff== 0)
+{
+      
+      if( Entier.isInteger && Chaine.isChaine == false)
+      System.out.println("-entier : "+Entier.result);
+
+      if(Chaine.isChaine==true)
+      {
+        System.out.println(" -chaine : "+Chaine.result);
+      }
+}
+      Entier.rent();
+      Chaine.rent();
+      mutexAff = 0 ;
+
+      :} RL S | E  
+{: 
+    if( Entier.isInteger && Chaine.isChaine == false)
+    System.out.println("-entier okok  : "+Entier.result);
+
+    if(Chaine.isChaine==true)
+    {
+       System.out.println(" -chaine : "+Chaine.result);
+    }
+        System.out.println("Au revoir");
+:}
+| 
+{: 
+    System.out.println("Au revoir");
+:} ;
+
+E::= G 
+| 
+error 
+{: 
+    System.out.println(Erreur.erreurDeTypage);
+    mutexAff = 0 ; 
+:}  E;
+
+G ::= IDENTCHAINE:ident AFFECT CHAINE:valeur  
+{:
+    if(! tableAssociation.containsKey(ident.substring(1)) || (tableAssociation.get(ident) instanceof String))
+        tableAssociation.put(ident,valeur.substring(1,valeur.length()-1));     
+:};
+G ::= IDENTENTIER:ident AFFECT ENTIER:valeur  
+{: 
+    if(! tableAssociation.containsKey(ident)|| (tableAssociation.get(ident) instanceof Integer))
+        tableAssociation.put(ident,valeur);
+:};
+
+E ::= E PLUS T 
+{:
+    if(Entier.isInteger==true && Chaine.isChaine == true)
+    {
+       System.out.println(Erreur.erreurOperateurPlus);
+       mutexAff = 1 ; 
+    }
+    else{
+        if(Entier.isInteger==true && Chaine.isChaine == false)
+        { 
+            Entier.resultatE = Entier.eval + (Entier.mutex == 1 ? Entier.resultatT : Entier.resultatTF); 
+            Entier.eval= Entier.resultatE;
+            Entier.result = Entier.resultatE;
+        }
+        if(Chaine.isChaine)
+        {
+            Chaine.resultatE = Chaine.eval + (Chaine.mutex == 1 ? Chaine.resultatT : Chaine.resultatTF); 
+            Chaine.eval= Chaine.resultatE;
+            Chaine.result = Chaine.resultatE;
+        }
+    }
+:} 
+| 
+error ;   
+
+E ::= E MINOS T 
+{:
+    if(Chaine.isChaine ==true)
+    {
+       System.out.println(Erreur.erreurOperateurMoins);
+          mutexAff = 1 ; 
+
+    }
+    else
+    {
+        Entier.resultatE = Entier.eval - (Entier.mutex == 1 ? Entier.resultatT : Entier.resultatTF); 
+        Entier.eval= Entier.resultatE;
+        Entier.result = Entier.resultatE;
+    }
+:} ;
+E ::= T 
+{: 
+    if(Entier.isInteger )
+    {
+       Entier.eval = (Entier.mutex == 1 ? Entier.resultatT : Entier.resultatTF ); 
+       Entier.muyex   = 0 ; 
+    }
+    if(Chaine.isChaine){
+       Chaine.eval = (Chaine.mutex == 1 ? Chaine.resultatT : Chaine.resultatTF ); 
+       Chaine.muyex   = 0 ; 
+    }
+:};
+T ::= T MULT F 
+    {: 
+        if(Entier.isInteger && Chaine.isChaine == false){
+            Entier.resultatT = (Entier.muyex ==1 ? Entier.resultatT + Entier.resultatTF * Entier.fval :   Entier.resultatTF * Entier.fval ); Entier.mutex = 1;
+            Entier.result  = Entier.resultatT;
+        }
+        if(Chaine.isChaine && Entier.isInteger)
+        {
+           Entier.isInteger = false;
+           Chaine.resultatT = (Chaine.muyex ==1 ? Chaine.resultatT + Chaine.resultatTF.repeat(Entier.fval) :   Chaine.resultatTF.repeat(Entier.fval )); Chaine.mutex = 1;
+           Chaine.result  = Chaine.resultatT;
+        }
+    :};
+    T ::= T DIV F 
+    {:
+            if(Entier.fval ==0){
+                System.out.println(Erreur.erreurDivisionZero);
+            mutexAff = 1 ;
+    }
+    else
+    {
+    Entier.resultatT = Entier.resultatT / Entier.fval; Entier.mutex = 1;
+    } 
+:}; 
+T ::= F 
+{: 
+    if(Entier.isInteger)
+    {
+        Entier.resultatTF = Entier.fval  ;
+    }
+    if(Chaine.isChaine)
+    {
+        Chaine.resultatTF = Chaine.fval  ; Chaine.resultatTF = Chaine.fval;
+    } 
+:}  ;
+F ::= IDENTENTIER:valeur {:  
+Entier.IdentEntier = valeur; 
+if(tableAssociation.get(Entier.IdentEntier)!=null)
+{
+   Entier.mutex = 0 ; Entier.fval =(Integer) tableAssociation.get(Entier.IdentEntier) ;
+   Entier.isInteger = true;
+
+}; 
+:};
+F ::=IDENTCHAINE:valeur {:
+
+    Chaine.IdentChaine = valeur; 
+    if(tableAssociation.get(Chaine.IdentChaine)!=null)
+    {
+       Chaine.mutex = 0 ; Chaine.fval =(String) tableAssociation.get(Chaine.IdentChaine) ;
+       Chaine.isChaine = true;
+    }
+; 
+:};
+F ::= ENTIER:valeur
+{:
+    Entier.mutex = 0 ; Entier.fval = (Integer)valeur;
+    Entier.isInteger = true;
+:}; 
+F ::= CHAINE:valeur
+{: 
+    Chaine.mutex = 0 ; Chaine.isChaine = true;
+    Chaine.fval = (String)valeur.substring(1,valeur.length()-1);
+:};
+F ::= OUVERTE E FERME  
+{:
+    if(Entier.isInteger && Chaine.isChaine == false){
+        Entier.fval  = Entier.eval ;  Entier.eval = 0; Entier.muyex = 1;}
+     if(Chaine.isChaine )
+     {
+        Chaine.fval  = Chaine.eval ;  Chaine.eval = new String(); Chaine.muyex = 1;
+     } 
+:}  ;
+
+F ::= PRINT 
+{:  
+    List<String> chaines = new ArrayList<String>();    
+    List<String> entiers = new ArrayList<String>();       
+
+    for (Map.Entry m : tableAssociation.entrySet()) {
+       String val = (String)m.getKey();
+       if(val.charAt(0)=='$')
+       {
+          chaines.add(val+"="+m.getValue());
+       }
+       else {
+          entiers.add(val+"="+m.getValue());
+       };
+    }
+   for(Iterator<String> it = chaines.iterator() ; it.hasNext(); )
+   {
+         System.out.println(it.next());
+   }
+   for(Iterator<String> it = entiers.iterator() ; it.hasNext(); )
+   {
+         System.out.println(it.next());
+   }
+:};
+

@@ -1,0 +1,53 @@
+
+*******GRAMMAIRE*******
+> S := E RL S | E RL | 
+> E := G| Error
+> G := IdEntier = ENTIER
+> G := IDChaine = CHAINE
+> E := E + T | E - T | T
+> T := T * F | T / F | F
+> F := ENTIER | CHAINE | (E)
+> F ::= PRINT
+********EXPLICATION DES TEST******
+
+/////////Operation multiple/////// :  
+5+2*3+5+2*7-2*4+6*7+2 => TEST OK
+/////////Operation multiple avec parentheses///////// :
+(5+3)*2+(5+2)*3 => TEST OK
+/////////Sauvegarder des chaines de caracteres dans la table de symbole et les additioner///////// 
+$a = "a" 
+$b = "b"
+$a + $b => TEST OK
+///////// Multiplication + Addition entre chaine///////// 
+"abc"+"efgh"+"i"*3 => TEST OK
+/////////Sauvegarder des entier dans la table de symbole et les additioner /////////
+a = 10
+b = 20
+a + b  => TEST OK
+/////////Operation multiple avec parentheses /////////
+$a = "a"
+$b = "b"
+c = 2
+($a + $b) * c => TEST OK
+($a + $b) * c + ($a + $b) * c => TEST OK
+/////////Operation entre chaine/////////
+$a = "a"
+$b = "b"
+c = 2
+$a + $b * c => TEST OK
+/////////Tester les erreurs /////////
+$a = 10  => ERREUR OK
+b = "Mohamed"
+"Mohamed"+3 => ERREUR OK
+3/0 => ERREUR OK
+/////////Tester l'affichage /////////
+PRINT => TEST OK
+
+
+**************TESTNOK******************
+L'interpreteur réalisé n'est pas capable de reconnetre si une variable utilisée dans une expression n'est pas déclarée. 
+Exemple 
+a = 10 
+a + b 
+Affichage attendu: variable b non recennue. 
+Affichage obtenu: - entier : 20
